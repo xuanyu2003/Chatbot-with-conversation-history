@@ -1,7 +1,10 @@
 import { useState } from "react";
 
-function InputBox({ onSend, isLoading }) {
+function InputBox({ onSend, isLoading, mode }) {
   const [input, setInput] = useState("");
+  const placeholder = mode === "quiz"
+    ? "Ask a study question or answer the quiz..."
+    : "Type a topic or question to learn more...";
 
   return (
     <div style={{ display: "flex", padding: "10px", gap: "10px" }}>
@@ -15,7 +18,7 @@ function InputBox({ onSend, isLoading }) {
           }
         }}
         disabled={isLoading}
-        placeholder="Type a message..."
+        placeholder={placeholder}
         style={{ flex: 1 }}
       />
       <button

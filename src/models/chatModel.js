@@ -1,4 +1,4 @@
-export async function sendMessageApi({ messages }) {
+export async function sendMessageApi({ messages, mode }) {
   try {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
     
@@ -8,10 +8,11 @@ export async function sendMessageApi({ messages }) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        messages: messages.map(msg => ({
+        messages: messages.map((msg) => ({
           role: msg.role,
           content: msg.content
-        }))
+        })),
+        mode: mode || "explain"
       })
     });
 

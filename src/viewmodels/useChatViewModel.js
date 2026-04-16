@@ -32,12 +32,61 @@ export function useChatViewModel() {
     const newChat = {
       id: Date.now(),
       title: "New Chat",
+      mode: "explain",
+      isStudyBuddy: false,
       messages: []
     };
     const updated = [newChat, ...conversations];
     setConversations(updated);
     setCurrentChat(newChat);
     saveConversations(updated);
+  };
+
+  const createStudyBuddyChat = () => {
+    const studyChat = {
+      id: Date.now(),
+      title: "Study Buddy",
+      mode: "explain",
+      isStudyBuddy: true,
+      messages: [
+        {
+          role: "assistant",
+          content: "Hi! I'm your study buddy. Today, what do you want to learn?"
+        }
+      ]
+    };
+    const updated = [studyChat, ...conversations];
+    setConversations(updated);
+    setCurrentChat(studyChat);
+    saveConversations(updated);
+  };
+
+  const setChatMode = (mode) => {
+    if (!currentChat) return;
+
+    const assistantPrompt =
+      mode === "quiz"
+        ? "Do you want to start a quiz now? I can ask you study questions based on what we've discussed."
+        : "What should I explain next based on our conversation?"
+
+    const modeMessage = {
+      role: "assistant",
+      content: assistantPrompt
+    };
+
+    const updatedChat = {
+      ...currentChat,
+      mode,
+      messages: [...currentChat.messages, modeMessage]
+    };
+
+    setCurrentChat(updatedChat);
+
+    const updatedConversations = conversations.map((c) =>
+      c.id === currentChat.id ? updatedChat : c
+    );
+    setConversations(updatedConversations);
+    saveConversations(updatedConversations);
   };
 
   const sendMessage = async (text) => {
@@ -49,11 +98,13 @@ export function useChatViewModel() {
 
     const updatedChat = { ...currentChat, messages: updatedMessages };
     if (currentChat.messages.length === 0) {
-      updatedChat.title = text.slice(0, 30) + (text.length > 30 ? "..." : "");
+      updatedChat.title = currentChat.isStudyBuddy
+        ? `Study: ${text.slice(0, 30)}${text.length > 30 ? "..." : ""}`
+        : `${text.slice(0, 30)}${text.length > 30 ? "..." : ""}`;
     }
     setCurrentChat(updatedChat);
 
-    const data = await sendMessageApi({ messages: updatedMessages });
+    const data = await sendMessageApi({ messages: updatedMessages, mode: currentChat.mode || "explain" });
 
     const aiMsg = {
       role: "assistant",
@@ -65,7 +116,9 @@ export function useChatViewModel() {
     setCurrentChat(finalChat);
 
     // Update conversations
-    const updatedConversations = conversations.map(c => c.id === currentChat.id ? finalChat : c);
+    const updatedConversations = conversations.map((c) =>
+      c.id === currentChat.id ? finalChat : c
+    );
     setConversations(updatedConversations);
     saveConversations(updatedConversations);
     setIsLoading(false);
@@ -94,8 +147,10 @@ export function useChatViewModel() {
     conversations,
     currentChat,
     createChat,
+    createStudyBuddyChat,
     setCurrentChat,
     sendMessage,
+    setChatMode,
     deleteChat,
     deleteAllChats,
     isLoading

@@ -12,6 +12,7 @@ function App() {
         currentChat={vm.currentChat}
         onSelect={vm.setCurrentChat}
         onNewChat={vm.createChat}
+        onNewStudyBuddy={vm.createStudyBuddyChat}
         onDeleteChat={vm.deleteChat}
         onDeleteAll={vm.deleteAllChats}
       />
@@ -19,6 +20,7 @@ function App() {
       <ChatWindow
         chat={vm.currentChat}
         onSend={vm.sendMessage}
+        onModeChange={vm.setChatMode}
         isLoading={vm.isLoading}
       />
     </div>

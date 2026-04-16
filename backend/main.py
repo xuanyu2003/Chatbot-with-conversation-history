@@ -33,6 +33,7 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     """Request to send a message to the chatbot"""
     messages: list[Message]
+    mode: str | None = "explain"
     conversation_id: str | None = None
 
 class ChatResponse(BaseModel):
@@ -71,8 +72,8 @@ async def chat(request: ChatRequest):
         # Convert Pydantic models to dicts for service
         messages = [msg.model_dump() for msg in request.messages]
         
-        # Get response from Gemini
-        reply = gemini_service.send_message(messages)
+        # Get response from Gemini with current chat mode
+        reply = gemini_service.send_message(messages, mode=request.mode or "explain")
         
         return ChatResponse(
             reply=reply,
@@ -102,7 +103,7 @@ async def batch_chat(requests: list[ChatRequest], background_tasks: BackgroundTa
         
         for request in requests:
             messages = [msg.model_dump() for msg in request.messages]
-            reply = gemini_service.send_message(messages)
+            reply = gemini_service.send_message(messages, mode=request.mode or "explain")
             
             responses.append(ChatResponse(
                 reply=reply,

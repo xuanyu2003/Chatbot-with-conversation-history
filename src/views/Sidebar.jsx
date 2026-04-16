@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Sidebar({ conversations, currentChat, onSelect, onNewChat, onDeleteChat, onDeleteAll }) {
+function Sidebar({ conversations, currentChat, onSelect, onNewChat, onNewStudyBuddy, onDeleteChat, onDeleteAll }) {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
@@ -8,6 +8,9 @@ function Sidebar({ conversations, currentChat, onSelect, onNewChat, onDeleteChat
       <div style={{ display: "flex", gap: "5px", marginBottom: "10px" }}>
         <button onClick={onNewChat} style={{ flex: 1 }}>
           + New Chat
+        </button>
+        <button onClick={onNewStudyBuddy} style={{ flex: 1, background: "#4f8cff", color: "white", border: "none", borderRadius: "4px" }}>
+          Study Buddy
         </button>
         {conversations.length > 0 && (
           <button 
